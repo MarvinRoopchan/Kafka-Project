@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: marvin_user
+      POSTGRES_PASSWORD: Rocky659803!
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:3.6
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      # In-cluster only
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+
+  producer:
+    build: ./apps/producer
+    image: rocky659803/marvin-producer:latest
+    container_name: producer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: roman-input
+    ports:
+      - "5003:5000"
+    depends_on:
+      - kafka
+
+  consumer:
+    build: ./apps/consumer
+    image: rocky659803/marvin-consumer:latest
+    container_name: consumer
+    environment:
+      DB_HOST: postgres
+      DB_NAME: postgres
+      DB_USER: marvin_user
+      DB_PASS: Rocky659803!
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_TOPIC: roman-input
+    ports:
+      - "5004:5000"
+    depends_on:
+      - postgres
+      - kafka
+
+  api:
+    build: ./apps/api
+    image: rocky659803/marvin-api:latest
+    container_name: api
+    environment:
+      PRODUCER_URL: http://producer:5000
+      CONSUMER_URL: http://consumer:5000
+    ports:
+      - "5002:5000"
+    depends_on:
+      - producer
+      - consumer
+
+  fe:
+    build: ./apps/fe
+    image: rocky659803/marvin-fe:latest
+    container_name: fe
+    environment:
+      API_URL: http://api:5000
+    ports:
+      - "5001:5000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+
+
