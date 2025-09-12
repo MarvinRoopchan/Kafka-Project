@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Result</title></head>
+<body>
+  <h1>Roman → Arabic Conversion</h1>
+
+  {% if result.status == "ok" %}
+    <p>Roman: {{ result.roman }}</p>
+    <p>Arabic: {{ result.arabic }}</p>
+    <p>Created At: {{ result.created_at }}</p>
+  {% elif result.status == "pending" %}
+    <p>Queued. Try again in a moment…</p>
+  {% else %}
+    <p>Status: {{ result.status }}</p>
+    <p>Message: {{ result.message }}</p>
+  {% endif %}
+
+  <a href="/">Go back</a>
+</body>
+</html>
