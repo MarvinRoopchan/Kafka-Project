@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe
+  namespace: romanstream
+  labels:
+    app: fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fe
+  template:
+    metadata:
+      labels:
+        app: fe
+    spec:
+      containers:
+        - name: fe
+          image: rocky659803/marvin-fe:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: app-config
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe
+  namespace: romanstream
+spec:
+  type: LoadBalancer
+  selector:
+    app: fe
+  ports:
+    - port: 80
+      targetPort: 5000

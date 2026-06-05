@@ -1,0 +1,23 @@
+# Optional: use instead of LoadBalancer on fe Service if AWS Load Balancer Controller is installed.
+# Change fe Service type to ClusterIP when using this Ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: romanstream-ingress
+  namespace: romanstream
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe
+                port:
+                  number: 5000

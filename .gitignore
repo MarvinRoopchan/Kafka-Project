@@ -1,0 +1,10 @@
+.env
+terraform.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+k8s/secret.yaml
+__pycache__/
+*.pyc
+.DS_Store

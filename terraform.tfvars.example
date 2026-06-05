@@ -1,0 +1,5 @@
+# Copy to terraform.tfvars (gitignored) and fill in values before running terraform apply.
+# Or export: export TF_VAR_db_password="your-secure-password"
+
+db_username = "marvin_user"
+db_password = "CHANGE_ME_TO_A_STRONG_PASSWORD"

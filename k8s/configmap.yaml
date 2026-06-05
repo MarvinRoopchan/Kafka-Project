@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: romanstream
+data:
+  KAFKA_TOPIC: roman-input
+  KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+  DB_NAME: postgres
+  PRODUCER_URL: http://producer:5000
+  CONSUMER_URL: http://consumer:5000
+  API_URL: http://api:5000
